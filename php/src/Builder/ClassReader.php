@@ -14,7 +14,9 @@ use PortableSchema\Builder\Attribute\Ui;
 /**
  * Reads a class whose public properties carry attributes into the same Schema the fluent calls would build.
  *
- * The class is an object schema. Each public property is a property of it, in declaration order:
+ * A class with public properties is an object schema; a class without any is a schema for one value, said by its
+ * `#[Of]` and `#[Keywords]`. Both are types once they carry a `#[Document]` id. Each public property is a property
+ * of the object, in declaration order:
  * - its name is the property's name;
  * - its type comes from `#[Of]`, else from the PHP type: `string`, `int`, `float`, `bool`, `array` (`items` from
  *   `#[Keywords(items: ...)]`), a backed enum (`enum` of its values), or a class (read the same way: referenced by its
@@ -51,18 +53,23 @@ final class ClassReader
             $schema = $schema->with('description', $document->description);
         }
         $of = self::attribute($reflection, Of::class);
-        $schema = $of === null ? $schema->with('type', 'object') : $schema->with('$ref', $of->ref);
-
+        if ($of !== null) {
+            $schema = $schema->with('$ref', self::ref($of->ref));
+        }
         $properties = [];
         foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if (!$property->isStatic()) {
                 $properties[$property->getName()] = self::property($property);
             }
         }
-        if ($properties !== []) {
-            $schema = $schema->properties($properties);
+        if ($properties === []) {
+            // One value: what the attributes say, and nothing else.
+            return self::common($schema, $reflection);
         }
-        $schema = self::common($schema, $reflection);
+        if ($of === null) {
+            $schema = $schema->with('type', 'object');
+        }
+        $schema = self::common($schema->properties($properties), $reflection);
         if (!$schema->has('unevaluatedProperties')) {
             $schema = $schema->with('unevaluatedProperties', false);
         }
@@ -75,7 +82,7 @@ final class ClassReader
         $of = self::attribute($property, Of::class);
         $nullable = $type?->allowsNull() ?? true;
         if ($of !== null) {
-            $schema = Schema::of($of->ref);
+            $schema = Schema::of(self::ref($of->ref));
             if ($nullable && $type !== null) {
                 $schema = Schema::anyOf([$schema, Schema::null()]);
             }
@@ -129,6 +136,21 @@ final class ClassReader
             $schemas[] = Schema::any()->with('type', count($json) === 1 ? $json[0] : $json);
         }
         return count($schemas) === 1 ? $schemas[0] : Schema::anyOf($schemas);
+    }
+
+    /**
+     * A reference as given, or the `#[Document]` id of a class given by name: `#[Of(PhoneNumber::class)]`.
+     */
+    private static function ref(string $ref): string
+    {
+        if (!class_exists($ref)) {
+            return $ref;
+        }
+        $id = self::attribute(new \ReflectionClass($ref), Document::class)?->id;
+        if ($id === null) {
+            throw new \InvalidArgumentException("$ref has no #[Document] id to reference.");
+        }
+        return $id;
     }
 
     /**

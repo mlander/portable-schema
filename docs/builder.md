@@ -123,7 +123,48 @@ Three conveniences go beyond one keyword each, and each writes standard keywords
 | `#[Check(name, options)]`, repeatable | `portable-check` |
 | `#[Ui(widget:, options:, fallback:, group:, weight:)]` | `x-portable-ui` |
 | `#[Document(id, title, description)]` on the class | `$id`, `title`, `description` of the root |
-| The class | `type: object`, `properties` in declaration order, `unevaluatedProperties: false` (a class is a concrete type; `#[Keywords(unevaluatedProperties: true)]` opens it) |
+| A class with public properties | `type: object`, `properties` in declaration order, `unevaluatedProperties: false` (a class is a concrete type; `#[Keywords(unevaluatedProperties: true)]` opens it) |
+| A class without public properties | One value: its `#[Of]` and `#[Keywords]`, nothing added |
+| `#[Of(TheClass::class)]`, or a property typed with a class that has a `#[Document]` id | `$ref` to that id |
+
+## Types: the library, the integration, the modules
+
+`Types` is the library and only the library. Nothing extends the class; a type outside the library is a reference to a schema in the registry, and the registry is open.
+
+| Tier | Ids | Written by | Spelled as |
+|---|---|---|---|
+| The library | `portable:label` | This repository, `types/v1` | `Types::label()`, generated |
+| The integration | `drupal:field_item.image`, `drupal:catalog/plugins/block` | The Drupal integration, from Typed Data, config schema and plugin discovery | `Schema::of('drupal:field_item.image')`; the integration can generate its own class the way `Types` is generated |
+| A module | `drupal:surface_examples/phone` | The module, with the builder | A class the module writes; `Schema::of()` or the class name |
+
+A module's types are classes. A class without public properties is a type for one value; a class with properties is a type for an object. Surface API calls the first a shape and the second a structure, and both are the same thing here: a schema with a `#[Document]` id, read by `ClassReader` and added to the registry.
+
+```php
+#[Document('drupal:surface_examples/phone', title: 'Phone')]
+#[Of('portable:string')]
+#[Keywords(pattern: '^\+?[0-9 ]{7,20}$', examples: ['+1 555 0100'])]
+final class PhoneNumber
+{
+}
+
+#[Document('drupal:surface_examples/contact', title: 'Contact')]
+final class Contact
+{
+    #[Of('portable:label')]
+    public string $name;
+
+    public ?PhoneNumber $phone = null;      // anyOf: the reference, or null
+
+    #[Of(PhoneNumber::class)]
+    public string $fax;                     // $ref: drupal:surface_examples/phone
+}
+```
+
+A property typed with such a class, or `#[Of(TheClass::class)]`, is a `$ref` to its id. A class without an id is written inline. The module registers nothing by hand: the integration discovers the classes (as Surface API discovers `#[Resource]` today), reads them, and adds the documents to the registry under the module's path, cached like a site schema dump.
+
+Another module extends a module's type the way it extends anything in Drupal: through the alter and extend contracts of the host, which compose a new document from the owner's and the contributor's calls. The builder itself has no extension point, because a type is a document and a document has no author.
+
+**Ids:** a schema id is a URI, so its namespace is a scheme, and a scheme allows letters, digits, `+`, `-` and `.` but not `_`. `surface_examples:phone` is refused by the registry; `spec/registry.md` allows `_` in a namespace, which the URI rule contradicts. Module machine names therefore go in the path, under the integration's namespace: `drupal:surface_examples/phone`. To raise with fago.
 
 ## Rules
 
@@ -161,6 +202,7 @@ What the Surface API builder says today and how the document says it, so the ret
 | `narrow('key')->when(Condition::equals(...))` | `when()`, or `if`/`then` by hand |
 | `attachVariants('settings', by: 'plugin', ...)` | `typeBy('drupal:block.settings.{plugin}', ['plugin' => Location::sibling('plugin')], fallback)` where each variant is a registry schema; `oneOf` of inline objects where they are not |
 | `#[RefinesInput]`, a runtime refiner | `refine('surface:<provider>', source)`, answered by a provider the site registers |
+| A shape (`PhoneNumber::define()`), a structure (`#[Structure]`) | A class with a `#[Document]` id, without or with properties; see [Types](#types-the-library-the-integration-the-modules) |
 | `attach()`, `attachList()`, `mountStructure()`, ports, mixins | `of('<id>')`, `list(of(...))`, `properties()`; the wiring of ports and the owner labels stay in Surface |
 | `x-surface` facts (`dependsOn`, `refined`, `live`, `fixed`, `rules`, `within`) | `annotation('x-surface', [...])` while they exist; most say what `portable-typeBy`, `portable-refine` and `if`/`then` already say in the document |
 | The schema reader, `SchemaReader::structure()` | `Schema::from()`, then a walk over `Schema` instead of over arrays |
@@ -176,7 +218,8 @@ Surface's `#[Input]`, `#[Constraint]`, `#[Widget]`, `#[Describe]` and `#[Rule]` 
 4. **Nullable references.** `?T` with `#[Of]` writes `anyOf: [{$ref}, {type: null}]`. A `type: [..., "null"]` beside the `$ref` would be shorter, but it needs the referenced type's JSON type, which only the registry knows.
 5. **Where do composition rules go?** Composition is two or more authors writing one document: a module adding a key to another module's resource, a contributor adding values to a fixed list, two alters touching one keyword. The rules decide what each may do: an added key lands under its author's name, a fixed list only gains values, a key that takes any value is never given a list by a contributor, one keyword has one owner and a second writer is refused. Decided 2026-11-10: they are part of Drupal's alter and extend contracts and stay in Surface API, which already has them (`extendChoices()`, `setThirdPartyDefinition()`, `mountStructure()`, `withdraw()`). The builder stays a value: `properties()` and `check()` add, nothing is refused and no owner is recorded. If a second host needs the same rules, a `Composer` beside the builder can take owner labels and apply them to `Schema` values with no Drupal dependency.
 6. **A JS builder.** The fixtures under `fixtures/builder` are the contract for one. Not started.
-7. **Canonical key order.** Rule 5 keeps authoring order. If diffs of generated schemas need stability, the order could follow `Keywords::TABLE`, which follows the meta-schemas.
+7. **Namespaces with `_`.** `spec/registry.md` allows `[a-z][a-z0-9_]*`, the registry refuses `surface_examples:phone` because a URI scheme has no `_`. Either the spec drops `_`, or module names go in the path under `drupal:`. The prototype does the second.
+8. **Canonical key order.** Rule 5 keeps authoring order. If diffs of generated schemas need stability, the order could follow `Keywords::TABLE`, which follows the meta-schemas.
 
 ## Plan
 
