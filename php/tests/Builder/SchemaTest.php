@@ -173,6 +173,16 @@ final class SchemaTest extends TestCase
         self::assertSame('{"widget":"time","group":"details","weight":5}', json_encode($document->{'x-portable-ui'}));
         self::assertSame('[{"rel":"options","href":"/api/options{?q}","source":{"q":"0/query"}}]', self::json($document->{'x-portable-links'}));
         self::assertSame('{"minLength":"Give a name."}', json_encode($document->{'x-portable-messages'}));
+
+        $object = Schema::object(['price' => Schema::number()->ui(group: 'pricing'), 'title' => Schema::string()])
+            ->ui(groups: ['pricing' => ['label' => 'Pricing']])
+            ->ui(groups: ['pricing' => ['label' => 'Pricing', 'widget' => 'details', 'options' => ['open' => false]]], weight: 3);
+        self::assertSame(
+            '{"groups":{"pricing":{"label":"Pricing","widget":"details","options":{"open":false}}},"weight":3}',
+            json_encode($object->toDocument()->{'x-portable-ui'}),
+        );
+        $validator = new Validator(Registry::withTypes()->add($object->id('test:priced')->document()));
+        self::assertTrue($validator->validate((object) ['price' => 2.5, 'title' => 'Tea'], 'test:priced')->valid);
     }
 
     public function testAHostAnnotationIsAnXKeyword(): void

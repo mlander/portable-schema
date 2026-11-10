@@ -95,7 +95,7 @@ Both produce [`fixtures/builder/display-settings.json`](../fixtures/builder/disp
 | A standard keyword | Its own name: `minLength(1)`, `default(20)`, `if(...)`, `not(...)` |
 | `$id`, `$ref`, `$defs`, `$comment`, `$anchor` | Without `$`: `id()`, `ref()`, `defs()`, `comment()`, `anchor()` |
 | `portable-check`, `portable-typeBy`, `portable-refine`, `portable-compare` | `check(name, options)`, `typeBy(href, source, fallback)`, `refine(provider, source)`, `compare(op, pointer)` |
-| `x-portable-ui`, `x-portable-links`, `x-portable-messages`, `x-portable-type`, ... | `ui(...)`, `link(rel, href, source)`, `message(code, text)`, `portableType()`, `translatable()`, `provider()`, `unchecked()` |
+| `x-portable-ui`, `x-portable-links`, `x-portable-messages`, `x-portable-type`, ... | `ui(...)`, `link(rel, href, source)`, `message(code, text)`, `portableType()`, `translatable()`, `provider()`, `unchecked()`; on an object, `ui(groups: [name => ['label' => ...]])` declares the groups its properties name by `ui(group:)` |
 | Any `x-` keyword | `annotation(name, value)` |
 | Any keyword by name | `with(keyword, value)`; `without(keyword)` |
 
@@ -122,6 +122,7 @@ Three conveniences go beyond one keyword each, and each writes standard keywords
 | `#[Schema(...)]` | Any keywords by method name; a schema-valued one takes a keyword map or a class name |
 | `#[Check(name, options)]`, repeatable | `portable-check` |
 | `#[Ui(widget:, options:, fallback:, group:, weight:)]` | `x-portable-ui` |
+| `#[Ui(groups: [name => ['label' => ...]])]` on the class | `x-portable-ui.groups` of the object: each group declared once, named by the properties' `#[Ui(group:)]` |
 | `#[Document(id, title, description)]` on the class | `$id`, `title`, `description` of the root |
 | A class with public properties | `type: object`, `properties` in declaration order, `unevaluatedProperties: false` (a class is a concrete type; `#[Schema(unevaluatedProperties: true)]` opens it) |
 | A class without public properties | One value: its `#[Of]` and `#[Schema]`, nothing added |
@@ -198,7 +199,7 @@ What the Surface API builder says today and how the document says it, so the ret
 | A reference to an entity, `SurfaceValidReference` | `check('drupal:ValidReference')`, and `link('lookup', href, source)` for the lookup |
 | `lock()`, `hold()`, a computed key | `readOnly(true)` |
 | `omit()` | The key left out of the document |
-| `setSetting('widget', ...)`, `describe(group:, weight:)` | `ui(widget:, group:, weight:, options:)`; placeholder, prefix, suffix and help under `options` |
+| `setSetting('widget', ...)`, `describe(group:, weight:)` | `ui(widget:, group:, weight:, options:)`; placeholder, prefix, suffix and help under `options`; the group's label and widget in `ui(groups:)` on the object |
 | `narrow('key')->when(Condition::equals(...))` | `when()`, or `if`/`then` by hand |
 | `attachVariants('settings', by: 'plugin', ...)` | `typeBy('drupal:block.settings.{plugin}', ['plugin' => Location::sibling('plugin')], fallback)` where each variant is a registry schema; `oneOf` of inline objects where they are not |
 | `#[RefinesInput]`, a runtime refiner | `refine('surface:<provider>', source)`, answered by a provider the site registers |
