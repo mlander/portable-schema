@@ -65,7 +65,7 @@ final class KeywordsTest extends TestCase
                 self::assertStringNotContainsString(" self $method(", $docblock, "$method() is static and must not be promised on an instance");
             }
         }
-        self::assertSame(['const', 'enum', 'allOf', 'anyOf', 'oneOf'], $static);
+        self::assertSame(['allOf', 'anyOf', 'oneOf', 'const', 'enum'], $static);
         self::assertSame('{"type":"string","enum":["a","b"]}', json_encode(Schema::string()->with('enum', ['a', 'b'])->toDocument()));
     }
 
