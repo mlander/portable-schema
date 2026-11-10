@@ -414,12 +414,17 @@ final class Schema implements \JsonSerializable
     /**
      * UI hints (`x-portable-ui`), merged with the ones already given.
      *
+     * `$groups` goes on the object whose properties name the groups by `$group`: a map from group name to
+     * `['label' => string, 'description' => ?string, 'widget' => ?string, 'options' => ?array, 'weight' => ?number]`,
+     * with `label` required.
+     *
      * @param array<string, mixed>|null $options
      * @param list<string>|null $fallback
+     * @param array<string, array<string, mixed>>|null $groups
      */
-    public function ui(?string $widget = null, ?array $options = null, ?array $fallback = null, ?string $group = null, int|float|null $weight = null): self
+    public function ui(?string $widget = null, ?array $options = null, ?array $fallback = null, ?string $group = null, int|float|null $weight = null, ?array $groups = null): self
     {
-        $given = array_filter(compact('widget', 'options', 'fallback', 'group', 'weight'), fn ($v) => $v !== null);
+        $given = array_filter(compact('widget', 'options', 'fallback', 'group', 'weight', 'groups'), fn ($v) => $v !== null);
         $ui = array_merge((array) ($this->keywords['x-portable-ui'] ?? []), $given);
         return $this->with('x-portable-ui', $ui);
     }

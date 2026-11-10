@@ -164,6 +164,39 @@
         },
         "weight": {
           "type": "number"
+        },
+        "groups": {
+          "description": "The groups that the keys of this object name by group, declared once.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/uiGroup"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "uiGroup": {
+      "type": "object",
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "minLength": 1
+        },
+        "options": {
+          "type": "object"
+        },
+        "weight": {
+          "type": "number"
         }
       },
       "additionalProperties": false

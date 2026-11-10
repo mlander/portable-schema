@@ -25,3 +25,4 @@ What follows from it, good and bad.
 | [0004](0004-types-for-all-primitives.md) | A named type for every primitive; standard time formats |
 | [0005](0005-profile-only-validators.md) | Profile-only validators; conformance by fixtures, Bowtie as oracle |
 | [0006](0006-catalogs-as-labeled-oneof.md) | Catalogs as `oneOf` + `const` + `title`, compiled to a set |
+| [0007](0007-ui-groups-declared-once.md) | UI groups declared once on the object under `x-portable-ui.groups` |

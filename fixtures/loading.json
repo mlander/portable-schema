@@ -754,5 +754,86 @@
       }
     },
     "refused": false
+  },
+  {
+    "description": "x-portable-ui groups on an object",
+    "schema": {
+      "$schema": "https://portable-schema.dev/v1/schema",
+      "$id": "test:load60",
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number",
+          "x-portable-ui": {
+            "group": "pricing"
+          }
+        },
+        "currency": {
+          "type": "string",
+          "x-portable-ui": {
+            "group": "pricing"
+          }
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "x-portable-ui": {
+        "groups": {
+          "pricing": {
+            "label": "Pricing",
+            "description": "What the item costs.",
+            "widget": "details",
+            "options": {
+              "open": false
+            },
+            "weight": 10
+          }
+        }
+      }
+    },
+    "refused": false
+  },
+  {
+    "description": "x-portable-ui group without a label",
+    "schema": {
+      "$schema": "https://portable-schema.dev/v1/schema",
+      "$id": "test:load61",
+      "x-portable-ui": {
+        "groups": {
+          "pricing": {
+            "widget": "details"
+          }
+        }
+      }
+    },
+    "refused": true
+  },
+  {
+    "description": "x-portable-ui group with an unknown member",
+    "schema": {
+      "$schema": "https://portable-schema.dev/v1/schema",
+      "$id": "test:load62",
+      "x-portable-ui": {
+        "groups": {
+          "pricing": {
+            "label": "Pricing",
+            "open": false
+          }
+        }
+      }
+    },
+    "refused": true
+  },
+  {
+    "description": "x-portable-ui with an unknown member",
+    "schema": {
+      "$schema": "https://portable-schema.dev/v1/schema",
+      "$id": "test:load63",
+      "x-portable-ui": {
+        "label": "Pricing"
+      }
+    },
+    "refused": true
   }
 ]

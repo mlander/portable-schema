@@ -1,6 +1,6 @@
 # Vocabulary
 
-This document covers `portable-check`; the other keywords follow.
+This document covers `portable-check` and `x-portable-ui`; the other keywords follow.
 
 The syntax of every keyword is defined in [`v1/vocab.json`](v1/vocab.json). This document defines their semantics.
 
@@ -60,3 +60,52 @@ Each check is described by a manifest, shipped by its integration, e.g. in a sit
 | `messages` | Source texts for the check's codes, in the [catalog format](../docs/decisions/0001-message-catalog-format.md) |
 
 A local callback replaces a check's implementation, not its manifest: the name, options and codes stay the same.
+
+## `x-portable-ui`
+
+Hints for drawing a form from the schema: which widget to use, its options, and how keys are grouped and ordered. The validators attach no semantics to it, and `Exporter` strips it with the other `x-portable-*` annotations.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "title": { "$ref": "portable:label", "x-portable-ui": { "weight": 0 } },
+    "price": { "type": "number", "x-portable-ui": { "group": "pricing", "weight": 1 } },
+    "currency": { "type": "string", "x-portable-ui": { "group": "pricing", "weight": 2 } }
+  },
+  "x-portable-ui": {
+    "groups": {
+      "pricing": { "label": "Pricing", "widget": "details", "options": { "open": false }, "weight": 10 }
+    }
+  }
+}
+```
+
+### Syntax
+
+An object. It is closed: a member not listed here makes the schema invalid.
+
+| Member | Meaning |
+|---|---|
+| `widget` | The widget that draws the value, in the host's words, e.g. `time` |
+| `options` | An object of options for that widget, e.g. a placeholder or help text |
+| `fallback` | Widgets to try, in order, when the host does not have `widget` |
+| `group` | The name of the group the key belongs to |
+| `weight` | A number that orders the key among its siblings and groups; lower comes first |
+| `groups` | A map from group name to a group, declared on the object schema whose `properties` name the groups |
+
+A group is a closed object:
+
+| Member | Meaning |
+|---|---|
+| `label` | Required. The group's label |
+| `description` | Text shown with the group |
+| `widget` | How the group is drawn, in the host's words, e.g. `fieldset` or `details` |
+| `options` | An object of options for that widget, e.g. `{"open": false}` |
+| `weight` | A number that orders the group among other groups and ungrouped keys |
+
+### Placement
+
+- **`x-portable-ui` is allowed on any schema.** The members a host reads depend on where it is: `widget`, `options`, `fallback`, `group` and `weight` on the schema of a key, `groups` on the object that holds the keys.
+- **A group is declared once,** under `groups` on the object, and each key names it by `group`.
+- **The dialect does not cross-check names.** A `group` that names no declared group, or a declared group that no key names, is not a validation error. The host decides how to draw such a key.

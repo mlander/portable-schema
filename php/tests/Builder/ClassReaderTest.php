@@ -47,4 +47,14 @@ final class ClassReaderTest extends TestCase
         self::assertSame('pattern', $result->errors[0]->code);
         self::assertSame('/fax', $result->errors[0]->instanceLocation);
     }
+
+    public function testAClassDeclaresTheGroupsItsPropertiesName(): void
+    {
+        $document = ClassReader::read(PricedItem::class)->document();
+        self::assertSame('{"groups":{"pricing":{"label":"Pricing","widget":"details","options":{"open":false}}}}', json_encode($document->{'x-portable-ui'}));
+        self::assertSame('{"group":"pricing","weight":1}', json_encode($document->properties->price->{'x-portable-ui'}));
+        self::assertObjectNotHasProperty('x-portable-ui', $document->properties->title);
+        $validator = new Validator(Registry::withTypes()->add($document));
+        self::assertTrue($validator->validate((object) ['title' => 'Tea', 'price' => 2.5], 'mymodule:priced_item')->valid);
+    }
 }

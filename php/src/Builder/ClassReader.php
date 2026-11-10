@@ -26,6 +26,8 @@ use PortableSchema\Builder\Attribute\Ui;
  * - it is required when it has no default and does not allow null, or carries `#[Required]`;
  * - `#[Schema]`, `#[Check]` and `#[Ui]` add the rest.
  *
+ * A `#[Ui]` on the class is the object's `x-portable-ui`, typically the `groups` its properties name.
+ *
  * The object is closed (`unevaluatedProperties: false`): a class is a concrete type. `#[Schema(unevaluatedProperties: true)]`
  * on the class opens it.
  */
@@ -64,12 +66,12 @@ final class ClassReader
         }
         if ($properties === []) {
             // One value: what the attributes say, and nothing else.
-            return self::common($schema, $reflection);
+            return self::ui(self::common($schema, $reflection), $reflection);
         }
         if ($of === null) {
             $schema = $schema->with('type', 'object');
         }
-        $schema = self::common($schema->properties($properties), $reflection);
+        $schema = self::ui(self::common($schema->properties($properties), $reflection), $reflection);
         if (!$schema->has('unevaluatedProperties')) {
             $schema = $schema->with('unevaluatedProperties', false);
         }
@@ -95,11 +97,14 @@ final class ClassReader
         }
         $required = self::attribute($property, Required::class) !== null
             || (!$property->hasDefaultValue() && !$nullable);
-        $ui = self::attribute($property, Ui::class);
-        if ($ui !== null) {
-            $schema = $schema->ui($ui->widget, $ui->options, $ui->fallback, $ui->group, $ui->weight);
-        }
+        $schema = self::ui($schema, $property);
         return $required ? $schema->required() : $schema;
+    }
+
+    private static function ui(Schema $schema, \ReflectionClass|\ReflectionProperty $target): Schema
+    {
+        $ui = self::attribute($target, Ui::class);
+        return $ui === null ? $schema : $schema->ui($ui->widget, $ui->options, $ui->fallback, $ui->group, $ui->weight, $ui->groups);
     }
 
     private static function typed(?\ReflectionType $type, \ReflectionProperty $property): Schema
