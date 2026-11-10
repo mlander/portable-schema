@@ -104,11 +104,12 @@ final class Schema implements \JsonSerializable
     }
 
     /**
-     * A reference to a schema by id: a type of the library (`portable:label`), a registry schema, or `#/$defs/name`.
+     * A reference to a schema by id: a type of the library (`portable:label`), a registry schema, `#/$defs/name`,
+     * or a class carrying `#[Document]`, given by name: `Schema::of(PhoneNumber::class)` is its id.
      */
     public static function of(string $ref): self
     {
-        return (new self())->with('$ref', $ref);
+        return (new self())->with('$ref', ClassReader::id($ref) ?? $ref);
     }
 
     /**

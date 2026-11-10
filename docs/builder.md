@@ -135,7 +135,7 @@ Three conveniences go beyond one keyword each, and each writes standard keywords
 |---|---|---|---|
 | The library | `portable:label` | This repository, `types/v1` | `Types::label()`, generated |
 | The integration | `drupal:field_item.image`, `drupal:catalog/plugins/block` | The Drupal integration, from Typed Data, config schema and plugin discovery | `Schema::of('drupal:field_item.image')`; the integration can generate its own class the way `Types` is generated |
-| A module | `drupal:surface_examples/phone` | The module, with the builder | A class the module writes; `Schema::of()` or the class name |
+| A module | `drupal:surface_examples/phone` | The module, with the builder, or as a JSON file it ships | `Schema::of(PhoneNumber::class)`, or the class as a property type |
 
 A module's types are classes. A class without public properties is a type for one value; a class with properties is a type for an object. Surface API calls the first a shape and the second a structure, and both are the same thing here: a schema with a `#[Document]` id, read by `ClassReader` and added to the registry.
 
@@ -160,7 +160,7 @@ final class Contact
 }
 ```
 
-A property typed with such a class, or `#[Of(TheClass::class)]`, is a `$ref` to its id. A class without an id is written inline. The module registers nothing by hand: the integration discovers the classes (as Surface API discovers `#[Resource]` today), reads them, and adds the documents to the registry under the module's path, cached like a site schema dump.
+A property typed with such a class, `#[Of(TheClass::class)]` or `Schema::of(TheClass::class)` is a `$ref` to its id. A class without an id is written inline. The module registers nothing by hand: the integration discovers the classes (as Surface API discovers `#[Resource]` today), reads them, and adds the documents to the registry under the module's path, cached like a site schema dump.
 
 Another module extends a module's type the way it extends anything in Drupal: through the alter and extend contracts of the host, which compose a new document from the owner's and the contributor's calls. The builder itself has no extension point, because a type is a document and a document has no author.
 

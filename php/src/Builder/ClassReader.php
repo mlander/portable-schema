@@ -139,18 +139,28 @@ final class ClassReader
     }
 
     /**
+     * The `#[Document]` id of a class given by name, or null for anything else.
+     *
+     * @throws \InvalidArgumentException for a class without an id: it cannot be referenced, only read inline
+     */
+    public static function id(string $class): ?string
+    {
+        if (!class_exists($class)) {
+            return null;
+        }
+        $id = self::attribute(new \ReflectionClass($class), Document::class)?->id;
+        if ($id === null) {
+            throw new \InvalidArgumentException("$class has no #[Document] id to reference.");
+        }
+        return $id;
+    }
+
+    /**
      * A reference as given, or the `#[Document]` id of a class given by name: `#[Of(PhoneNumber::class)]`.
      */
     private static function ref(string $ref): string
     {
-        if (!class_exists($ref)) {
-            return $ref;
-        }
-        $id = self::attribute(new \ReflectionClass($ref), Document::class)?->id;
-        if ($id === null) {
-            throw new \InvalidArgumentException("$ref has no #[Document] id to reference.");
-        }
-        return $id;
+        return self::id($ref) ?? $ref;
     }
 
     /**

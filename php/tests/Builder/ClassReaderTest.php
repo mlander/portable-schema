@@ -6,6 +6,7 @@ namespace PortableSchema\Tests\Builder;
 
 use PHPUnit\Framework\TestCase;
 use PortableSchema\Builder\ClassReader;
+use PortableSchema\Builder\Schema;
 use PortableSchema\Registry;
 use PortableSchema\Validator;
 
@@ -25,6 +26,14 @@ final class ClassReaderTest extends TestCase
         self::assertSame('{"anyOf":[{"$ref":"drupal:surface_examples/phone"},{"type":"null"}],"default":null}', json_encode($document->properties->phone, JSON_UNESCAPED_SLASHES));
         self::assertSame('{"$ref":"drupal:surface_examples/phone"}', json_encode($document->properties->fax, JSON_UNESCAPED_SLASHES));
         self::assertSame(['name', 'fax'], $document->required);
+    }
+
+    public function testAClassIsReferencedByNameInFluentCalls(): void
+    {
+        self::assertSame('drupal:surface_examples/phone', Schema::of(PhoneNumber::class)->get('$ref'));
+        self::assertSame('#/$defs/x', Schema::of('#/$defs/x')->get('$ref'));
+        $this->expectException(\InvalidArgumentException::class);
+        Schema::of(FeaturedItem::class);
     }
 
     public function testBothTypesLoadAndValidateTogether(): void
