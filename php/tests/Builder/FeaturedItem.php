@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PortableSchema\Tests\Builder;
 
-use PortableSchema\Builder\Attribute\Keywords;
+use PortableSchema\Builder\Attribute\Schema;
 use PortableSchema\Builder\Attribute\Of;
 
 /**
@@ -15,6 +15,6 @@ final class FeaturedItem
     #[Of('portable:label')]
     public string $title;
 
-    #[Keywords(format: 'uri')]
+    #[Schema(format: 'uri')]
     public string $url;
 }

@@ -62,24 +62,24 @@ A class with attributes:
 final class DisplaySettings
 {
     #[Of('portable:label')]
-    #[Keywords(title: 'Heading', description: 'Text shown above the listing.')]
+    #[Schema(title: 'Heading', description: 'Text shown above the listing.')]
     public string $heading = 'Latest articles';
 
     #[Of('portable:integer')]
-    #[Keywords(title: 'Items per page', minimum: 1, maximum: 100)]
+    #[Schema(title: 'Items per page', minimum: 1, maximum: 100)]
     public int $items_per_page = 20;
 
-    #[Keywords(title: 'Show author')]
+    #[Schema(title: 'Show author')]
     public bool $show_author = true;
 
-    #[Keywords(
+    #[Schema(
         anyOf: [['type' => 'string', 'format' => 'uri'], ['type' => 'integer', 'minimum' => 1]],
         title: 'Logo',
         description: 'A logo URI or the ID of a managed media item.',
     )]
     public mixed $logo;
 
-    #[Keywords(title: 'Featured items', items: FeaturedItem::class)]
+    #[Schema(title: 'Featured items', items: FeaturedItem::class)]
     public array $featured_items = [];
 }
 
@@ -116,15 +116,15 @@ Three conveniences go beyond one keyword each, and each writes standard keywords
 | `?T`, or `T\|null` | `null` added to `type`; with `#[Of]`, `anyOf` of the reference and `null` |
 | A backed enum | `enum` of its values |
 | A class | Read the same way: `$ref` to its `#[Document]` id, else written inline |
-| `mixed` | Any value; say the rest with `#[Keywords]` |
+| `mixed` | Any value; say the rest with `#[Schema]` |
 | An initializer | `default` |
 | No default, and no null allowed | Listed in `required`; `#[Required]` lists a property that has a default |
-| `#[Keywords(...)]` | Any keywords by method name; a schema-valued one takes a keyword map or a class name |
+| `#[Schema(...)]` | Any keywords by method name; a schema-valued one takes a keyword map or a class name |
 | `#[Check(name, options)]`, repeatable | `portable-check` |
 | `#[Ui(widget:, options:, fallback:, group:, weight:)]` | `x-portable-ui` |
 | `#[Document(id, title, description)]` on the class | `$id`, `title`, `description` of the root |
-| A class with public properties | `type: object`, `properties` in declaration order, `unevaluatedProperties: false` (a class is a concrete type; `#[Keywords(unevaluatedProperties: true)]` opens it) |
-| A class without public properties | One value: its `#[Of]` and `#[Keywords]`, nothing added |
+| A class with public properties | `type: object`, `properties` in declaration order, `unevaluatedProperties: false` (a class is a concrete type; `#[Schema(unevaluatedProperties: true)]` opens it) |
+| A class without public properties | One value: its `#[Of]` and `#[Schema]`, nothing added |
 | `#[Of(TheClass::class)]`, or a property typed with a class that has a `#[Document]` id | `$ref` to that id |
 
 ## Types: the library, the integration, the modules
@@ -142,7 +142,7 @@ A module's types are classes. A class without public properties is a type for on
 ```php
 #[Document('drupal:surface_examples/phone', title: 'Phone')]
 #[Of('portable:string')]
-#[Keywords(pattern: '^\+?[0-9 ]{7,20}$', examples: ['+1 555 0100'])]
+#[Schema(pattern: '^\+?[0-9 ]{7,20}$', examples: ['+1 555 0100'])]
 final class PhoneNumber
 {
 }
@@ -208,7 +208,7 @@ What the Surface API builder says today and how the document says it, so the ret
 | The schema reader, `SchemaReader::structure()` | `Schema::from()`, then a walk over `Schema` instead of over arrays |
 | Form API generation from the `SurfaceInterface` | An adapter that walks the `Schema` tree, or asks `subschemaAt()` per element |
 
-Surface's `#[Input]`, `#[Constraint]`, `#[Widget]`, `#[Describe]` and `#[Rule]` attributes become `#[Of]`, `#[Keywords]`, `#[Check]` and `#[Ui]`, or stay as Surface's own attributes that its reader turns into the same calls. Operations, access, storage, staging and the pipeline do not change: they take a document instead of a `SurfaceInterface`.
+Surface's `#[Input]`, `#[Constraint]`, `#[Widget]`, `#[Describe]` and `#[Rule]` attributes become `#[Of]`, `#[Schema]`, `#[Check]` and `#[Ui]`, or stay as Surface's own attributes that its reader turns into the same calls. Operations, access, storage, staging and the pipeline do not change: they take a document instead of a `SurfaceInterface`.
 
 ## Open questions
 

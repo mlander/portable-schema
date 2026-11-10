@@ -6,7 +6,7 @@ namespace PortableSchema\Builder;
 
 use PortableSchema\Builder\Attribute\Check;
 use PortableSchema\Builder\Attribute\Document;
-use PortableSchema\Builder\Attribute\Keywords as KeywordsAttribute;
+use PortableSchema\Builder\Attribute\Schema as SchemaAttribute;
 use PortableSchema\Builder\Attribute\Of;
 use PortableSchema\Builder\Attribute\Required;
 use PortableSchema\Builder\Attribute\Ui;
@@ -19,14 +19,14 @@ use PortableSchema\Builder\Attribute\Ui;
  * of the object, in declaration order:
  * - its name is the property's name;
  * - its type comes from `#[Of]`, else from the PHP type: `string`, `int`, `float`, `bool`, `array` (`items` from
- *   `#[Keywords(items: ...)]`), a backed enum (`enum` of its values), or a class (read the same way: referenced by its
+ *   `#[Schema(items: ...)]`), a backed enum (`enum` of its values), or a class (read the same way: referenced by its
  *   `#[Document]` id, else written inline);
  * - `?T` allows null; a nullable `#[Of]` becomes `anyOf` of the reference and `null`;
  * - an initializer is `default`;
  * - it is required when it has no default and does not allow null, or carries `#[Required]`;
- * - `#[Keywords]`, `#[Check]` and `#[Ui]` add the rest.
+ * - `#[Schema]`, `#[Check]` and `#[Ui]` add the rest.
  *
- * The object is closed (`unevaluatedProperties: false`): a class is a concrete type. `#[Keywords(unevaluatedProperties: true)]`
+ * The object is closed (`unevaluatedProperties: false`): a class is a concrete type. `#[Schema(unevaluatedProperties: true)]`
  * on the class opens it.
  */
 final class ClassReader
@@ -164,7 +164,7 @@ final class ClassReader
 
     private static function common(Schema $schema, \ReflectionClass|\ReflectionProperty $target): Schema
     {
-        foreach ($target->getAttributes(KeywordsAttribute::class) as $attribute) {
+        foreach ($target->getAttributes(SchemaAttribute::class) as $attribute) {
             foreach ($attribute->newInstance()->keywords as $method => $value) {
                 $keyword = Keywords::keyword($method) ?? $method;
                 if (Keywords::shape($keyword) !== Keywords::VALUE && is_string($value) && class_exists($value)) {

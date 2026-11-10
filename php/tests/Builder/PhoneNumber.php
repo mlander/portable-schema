@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace PortableSchema\Tests\Builder;
 
 use PortableSchema\Builder\Attribute\Document;
-use PortableSchema\Builder\Attribute\Keywords;
+use PortableSchema\Builder\Attribute\Schema;
 use PortableSchema\Builder\Attribute\Of;
 
 /**
@@ -13,7 +13,7 @@ use PortableSchema\Builder\Attribute\Of;
  */
 #[Document('drupal:surface_examples/phone', title: 'Phone', description: 'Digits, with spaces if you like, and a leading + for a country code.')]
 #[Of('portable:string')]
-#[Keywords(pattern: '^\+?[0-9 ]{7,20}$', examples: ['+1 555 0100'])]
+#[Schema(pattern: '^\+?[0-9 ]{7,20}$', examples: ['+1 555 0100'])]
 final class PhoneNumber
 {
 }
