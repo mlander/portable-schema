@@ -17,6 +17,11 @@ namespace PortableSchema\Builder;
  * `portable-check`, `ui()` for `x-portable-ui`), each taking the keyword's value. A few take arguments that build the
  * value (`typeBy()`, `check()`, `ui()`, `link()`, `message()`); `with()` takes any keyword by name.
  *
+ * `enum`, `const`, `allOf`, `anyOf` and `oneOf` are starting points, static: on a schema that exists they are
+ * `with('enum', ...)` and so on. PHP lets a static method be called on an instance and then drops the instance, so
+ * `Schema::string()->enum([...])` would lose the `type`; `__call` refuses nothing here because the static method is
+ * found first. `KeywordsTest` pins which keywords are static.
+ *
  * @method self id(string $id)
  * @method self schema(string $dialect)
  * @method self ref(string $ref)
@@ -33,15 +38,10 @@ namespace PortableSchema\Builder;
  * @method self if(Schema|array|bool $schema)
  * @method self then(Schema|array|bool $schema)
  * @method self else(Schema|array|bool $schema)
- * @method self allOf(array $schemas)
- * @method self anyOf(array $schemas)
- * @method self oneOf(array $schemas)
  * @method self not(Schema|array|bool $schema)
  * @method self unevaluatedItems(Schema|array|bool $schema)
  * @method self unevaluatedProperties(Schema|array|bool $schema)
  * @method self type(string|array $type)
- * @method self const(mixed $value)
- * @method self enum(array $values)
  * @method self multipleOf(int|float $divisor)
  * @method self maximum(int|float $limit)
  * @method self exclusiveMaximum(int|float $limit)

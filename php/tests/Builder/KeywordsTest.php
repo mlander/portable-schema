@@ -50,6 +50,25 @@ final class KeywordsTest extends TestCase
         }
     }
 
+    /**
+     * A keyword whose method is a static starting point has no instance form: `with()` is the instance form, and the
+     * docblock must not promise one, since an instance call to a static method drops the receiver.
+     */
+    public function testStaticStartingPointsAreNotPromisedAsInstanceMethods(): void
+    {
+        $docblock = (new \ReflectionClass(Schema::class))->getDocComment();
+        $static = [];
+        foreach (array_keys(Keywords::TABLE) as $keyword) {
+            $method = Keywords::method($keyword);
+            if (method_exists(Schema::class, $method) && (new \ReflectionMethod(Schema::class, $method))->isStatic()) {
+                $static[] = $method;
+                self::assertStringNotContainsString(" self $method(", $docblock, "$method() is static and must not be promised on an instance");
+            }
+        }
+        self::assertSame(['const', 'enum', 'allOf', 'anyOf', 'oneOf'], $static);
+        self::assertSame('{"type":"string","enum":["a","b"]}', json_encode(Schema::string()->with('enum', ['a', 'b'])->toDocument()));
+    }
+
     public function testHostAnnotationsAreValues(): void
     {
         self::assertSame(Keywords::VALUE, Keywords::shape('x-surface'));

@@ -101,6 +101,8 @@ Both produce [`fixtures/builder/display-settings.json`](../fixtures/builder/disp
 
 Starting points: `Schema::of($ref)`, `Schema::string()`, `integer()`, `number()`, `bool()`, `null()`, `object([...])`, `list($items)`, `map($values)`, `anyOf()`, `oneOf()`, `allOf()`, `enum()`, `const()`, `options([value => title])` (a labeled catalog), `any()`, `boolean(false)`, `keywords([...])`, `from($document)`.
 
+`enum`, `const`, `allOf`, `anyOf` and `oneOf` exist only as starting points. On a schema that exists they are `with('enum', [...])`: PHP runs a static method called on an instance and drops the instance, so `Schema::string()->enum([...])` would lose the `type`. A test pins the list.
+
 Three conveniences go beyond one keyword each, and each writes standard keywords only:
 
 - `->required()` without names marks a property; the object that places it lists it in `required`. With names it is the keyword.
