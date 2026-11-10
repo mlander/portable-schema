@@ -1,0 +1,63 @@
+{
+  "$schema": "https://portable-schema.dev/v1/schema",
+  "$id": "mymodule:display_settings",
+  "title": "Display settings",
+  "type": "object",
+  "properties": {
+    "heading": {
+      "$ref": "portable:label",
+      "title": "Heading",
+      "description": "Text shown above the listing.",
+      "default": "Latest articles"
+    },
+    "items_per_page": {
+      "$ref": "portable:integer",
+      "title": "Items per page",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 20
+    },
+    "show_author": {
+      "type": "boolean",
+      "title": "Show author",
+      "default": true
+    },
+    "logo": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uri"
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "title": "Logo",
+      "description": "A logo URI or the ID of a managed media item."
+    },
+    "featured_items": {
+      "type": "array",
+      "title": "Featured items",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "$ref": "portable:label"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "title",
+          "url"
+        ],
+        "unevaluatedProperties": false
+      },
+      "default": []
+    }
+  },
+  "unevaluatedProperties": false
+}
