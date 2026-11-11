@@ -26,7 +26,7 @@ export type Case = {
   unchecked?: unknown[];
   options?: { partial?: boolean; emptyAsMissing?: boolean; locations?: string[] };
   messages?: string[];
-  checks?: Record<string, { errors: { code: string; params: Record<string, unknown>; message?: string }[]; locations?: string[] }>;
+  checks?: Record<string, { errors: { code: string; params: Record<string, unknown>; message?: string; location?: string }[]; locations?: string[] }>;
   location?: string;
   schemaLocations?: string[];
   unresolved?: string[];

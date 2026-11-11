@@ -1,0 +1,29 @@
+{
+  "description": "named checks: an error located below the value the check was asked about",
+  "schema": {
+    "$schema": "https://portable-schema.dev/v1/schema",
+    "type": "object",
+    "properties": {
+      "deadline": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "integer"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "portable-check": {
+          "test:Deadline": {}
+        }
+      }
+    }
+  }
+}

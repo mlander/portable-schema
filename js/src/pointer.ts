@@ -23,6 +23,9 @@ export const segments = (pointer: string): string[] =>
 
 export const append = (pointer: string, segment: string | number): string => pointer + "/" + escape(String(segment));
 
+/** Whether a value is a JSON Pointer (RFC 6901): empty, or segments each starting with `/`. */
+export const isPointer = (value: string): boolean => /^(\/([^~/]|~[01])*)*$/u.test(value);
+
 /** Whether `pointer` equals `base` or lies below it. */
 export const isWithin = (pointer: string, base: string): boolean =>
   base === "" || pointer === base || pointer.startsWith(base + "/");

@@ -1,0 +1,154 @@
+[
+  {
+    "description": "an error with a location is reported below the value the check was asked about",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {
+              "amount": 90
+            },
+            "location": "/amount"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day"
+      }
+    },
+    "valid": false,
+    "errors": [
+      {
+        "instanceLocation": "/deadline/amount",
+        "code": "check.test:Deadline",
+        "params": {
+          "amount": 90
+        }
+      }
+    ]
+  },
+  {
+    "description": "an empty location is the value the check was asked about",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": ""
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day"
+      }
+    },
+    "valid": false,
+    "errors": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "params": {}
+      }
+    ]
+  },
+  {
+    "description": "a location that is not a JSON Pointer is a failed check",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": "amount"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day"
+      }
+    },
+    "valid": true,
+    "unchecked": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "reason": "error"
+      }
+    ]
+  },
+  {
+    "description": "a location past the end of a list in the value is a failed check",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": "/slots/9"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day",
+        "slots": [
+          "am",
+          "pm"
+        ]
+      }
+    },
+    "valid": true,
+    "unchecked": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "reason": "error"
+      }
+    ]
+  },
+  {
+    "description": "a location naming a property the value does not hold is a failed check",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": "/nope"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day",
+        "slots": [
+          "am",
+          "pm"
+        ]
+      }
+    },
+    "valid": true,
+    "unchecked": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "reason": "error"
+      }
+    ]
+  }
+]

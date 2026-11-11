@@ -103,6 +103,10 @@
                   },
                   "message": {
                     "type": "string"
+                  },
+                  "location": {
+                    "description": "A JSON Pointer relative to the location the check was asked about.",
+                    "type": "string"
                   }
                 },
                 "additionalProperties": false

@@ -436,8 +436,15 @@ final class Shaper
             if ($result->unchecked !== null) {
                 $shaped->unchecked[] = new Unchecked($request->location, 'check.' . $request->name, $result->unchecked);
             }
-            foreach ($result->errors as $e) {
-                $shaped->errors[] = $error($e['code'], $e['params'], $request->location, $e['message'] ?? null);
+            // An error's own location is relative to the request's; one that is not a JSON Pointer, or names no
+            // value present in the instance, makes the result one the provider failed to give.
+            $relative = array_map(fn (array $e) => $e['location'] ?? '', $result->errors);
+            if (array_filter($relative, fn (mixed $at) => !is_string($at) || !Pointer::isPointer($at) || !Pointer::get($request->value, $at)[0]) !== []) {
+                $shaped->unchecked[] = new Unchecked($request->location, 'check.' . $request->name, 'error');
+                continue;
+            }
+            foreach ($result->errors as $i => $e) {
+                $shaped->errors[] = $error($e['code'], $e['params'], $request->location . $relative[$i], $e['message'] ?? null);
             }
         }
         return $shaped;
