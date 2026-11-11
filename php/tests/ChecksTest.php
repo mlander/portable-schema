@@ -107,6 +107,19 @@ final class ChecksTest extends TestCase
         $this->assertSame([['instanceLocation' => '/0', 'code' => 'check.test:Unique', 'reason' => 'error']], array_map(fn ($u) => $u->toArray(), $result->unchecked));
     }
 
+    public function testErrorLocationNamingNoValueIsUnchecked(): void
+    {
+        $schema = '{"$schema": "https://portable-schema.dev/v1/schema", "type": "object", "properties": {"m": {"type": "object", "properties": {"l": {"type": "array", "items": {"type": "string"}}}, "portable-check": {"test:M": {}}}}}';
+        $registry = Registry::withTypes()->add(Json::decode($schema), 'test:m');
+        foreach (['/l/9', '/nope'] as $location) {
+            $result = (new Validator($registry))
+                ->withCheck('test:M', fn (array $requests) => array_map(fn ($r) => new CheckResult([['code' => 'check.test:M', 'params' => [], 'location' => $location]]), $requests))
+                ->validate(Json::decode('{"m": {"l": ["p", "q"]}}'), 'test:m');
+            $this->assertTrue($result->valid, $location);
+            $this->assertSame([['instanceLocation' => '/m', 'code' => 'check.test:M', 'reason' => 'error']], array_map(fn ($u) => $u->toArray(), $result->unchecked), $location);
+        }
+    }
+
     public function testUncheckedMessage(): void
     {
         $result = $this->validator()->validate(['a'], 'test:schema');

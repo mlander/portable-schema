@@ -37,6 +37,18 @@ describe("named checks", () => {
     expect(result.unchecked).toEqual([]);
   });
 
+  test("an error location naming no value in the instance is unchecked", async () => {
+    const schema = { $schema: "https://portable-schema.dev/v1/schema", type: "object", properties: { m: { type: "object", properties: { l: { type: "array", items: { type: "string" } } }, "portable-check": { "test:M": {} } } } };
+    const registry = Registry.withTypes().add(schema, "test:m");
+    for (const location of ["/l/9", "/nope"]) {
+      const result = (await Validator.create(registry))
+        .withCheck("test:M", (requests) => requests.map(() => new CheckResult([{ code: "check.test:M", params: {}, location }])))
+        .validate({ m: { l: ["p", "q"] } }, "test:m");
+      expect(result.valid).toBe(true);
+      expect(result.unchecked.map((u) => u.toJSON())).toEqual([{ instanceLocation: "/m", code: "check.test:M", reason: "error" }]);
+    }
+  });
+
   test("a failing provider is unchecked", async () => {
     const result = (await validator())
       .withCheck("test:Unique", () => {

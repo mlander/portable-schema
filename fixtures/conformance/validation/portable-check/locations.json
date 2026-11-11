@@ -12,6 +12,12 @@
           },
           "unit": {
             "type": "string"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "portable-check": {

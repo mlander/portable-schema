@@ -295,10 +295,10 @@ export class Shaper {
       if (result.unchecked !== null) {
         shaped.unchecked.push(new Unchecked(request.location, "check." + request.name, result.unchecked));
       }
-      // An error's own location is relative to the request's; one that is not a JSON Pointer makes the result one
-      // the provider failed to give.
+      // An error's own location is relative to the request's; one that is not a JSON Pointer, or names no value
+      // present in the instance, makes the result one the provider failed to give.
       const relative = result.errors.map((e) => e.location ?? "");
-      if (relative.some((at) => typeof at !== "string" || !Pointer.isPointer(at))) {
+      if (relative.some((at) => typeof at !== "string" || !Pointer.isPointer(at) || !Pointer.get(request.value, at)[0])) {
         shaped.unchecked.push(new Unchecked(request.location, "check." + request.name, "error"));
         continue;
       }

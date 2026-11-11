@@ -86,5 +86,69 @@
         "reason": "error"
       }
     ]
+  },
+  {
+    "description": "a location past the end of a list in the value is a failed check",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": "/slots/9"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day",
+        "slots": [
+          "am",
+          "pm"
+        ]
+      }
+    },
+    "valid": true,
+    "unchecked": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "reason": "error"
+      }
+    ]
+  },
+  {
+    "description": "a location naming a property the value does not hold is a failed check",
+    "checks": {
+      "test:Deadline": {
+        "errors": [
+          {
+            "code": "check.test:Deadline",
+            "params": {},
+            "location": "/nope"
+          }
+        ]
+      }
+    },
+    "data": {
+      "deadline": {
+        "amount": 90,
+        "unit": "day",
+        "slots": [
+          "am",
+          "pm"
+        ]
+      }
+    },
+    "valid": true,
+    "unchecked": [
+      {
+        "instanceLocation": "/deadline",
+        "code": "check.test:Deadline",
+        "reason": "error"
+      }
+    ]
   }
 ]
