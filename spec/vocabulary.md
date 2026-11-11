@@ -37,6 +37,7 @@ Results:
 
 - **Errors use the code `check.<name>`** (e.g. `check.drupal:UniqueField`), or sub-codes `check.<name>.<sub>` declared in the manifest.
 - **An error may carry a rendered `message`.** Formatters use it instead of the catalog.
+- **An error may carry a `location`**: a JSON Pointer relative to the location of the value the check was asked about. The error is reported at that location joined to the one it was asked about, e.g. `/deadline` + `/amount` = `/deadline/amount`. Without it, the error is reported where the check was asked. A `location` that is not a JSON Pointer is a failed check: reported in `unchecked` with reason `error`, its errors dropped.
 - **A check that could not run** is reported in `unchecked` with a reason (see [`errors.md`](errors.md)). It never counts as passed.
 
 ### Check manifests

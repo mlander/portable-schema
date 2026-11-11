@@ -12,7 +12,11 @@ export class CheckRequest {
   ) {}
 }
 
-export type CheckError = { code: string; params: Record<string, unknown>; message?: string };
+/**
+ * One error of a check. `location`, when given, is a JSON Pointer relative to the request's location: the error is
+ * about the value there, e.g. `/amount` for a check on an object that refuses its `amount`.
+ */
+export type CheckError = { code: string; params: Record<string, unknown>; message?: string; location?: string };
 
 /** The outcome of a check for one request: errors, or why it could not run. */
 export class CheckResult {

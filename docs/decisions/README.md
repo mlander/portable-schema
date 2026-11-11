@@ -26,3 +26,4 @@ What follows from it, good and bad.
 | [0005](0005-profile-only-validators.md) | Profile-only validators; conformance by fixtures, Bowtie as oracle |
 | [0006](0006-catalogs-as-labeled-oneof.md) | Catalogs as `oneOf` + `const` + `title`, compiled to a set |
 | [0007](0007-ui-groups-declared-once.md) | UI groups declared once on the object under `x-portable-ui.groups` |
+| [0008](0008-check-error-locations.md) | A check's error may name its own location, relative to the value it was asked about |

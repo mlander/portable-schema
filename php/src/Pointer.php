@@ -58,6 +58,14 @@ final class Pointer
     }
 
     /**
+     * Whether $value is a JSON Pointer (RFC 6901): empty, or segments each starting with `/`.
+     */
+    public static function isPointer(string $value): bool
+    {
+        return preg_match('#^(/([^~/]|~[01])*)*$#u', $value) === 1;
+    }
+
+    /**
      * Whether $pointer equals $base or lies below it.
      */
     public static function isWithin(string $pointer, string $base): bool
